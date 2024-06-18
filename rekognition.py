@@ -1,5 +1,4 @@
 import logging
-import time
 
 import cv2
 from botocore.exceptions import ClientError
@@ -53,61 +52,3 @@ def censor_face(frame, left, top, width, height, pixelation_level=10):
     frame[top:top + height, left:left + width] = pixelated_face
 
     return frame
-
-
-def main():
-    face_detector = FaceDetector()
-
-    # Initialize the video capture object
-    video_capture = cv2.VideoCapture(0)
-
-    if not video_capture.isOpened():
-        print("Error: Could not open video device.")
-        return
-
-    try:
-        while True:
-            # Capture frame-by-frame
-            ret, frame = video_capture.read()
-
-            if not ret:
-                print("Failed to capture image")
-                break
-
-            # Detect faces in the current frame
-            faces = face_detector.detect_faces_in_frame(frame)
-            print(faces)
-
-            # Censor faces in the current frame
-            for face in faces:
-                bbox = face['BoundingBox']
-                left = int(bbox['Left'] * frame.shape[1])
-                top = int(bbox['Top'] * frame.shape[0])
-                width = int(bbox['Width'] * frame.shape[1])
-                height = int(bbox['Height'] * frame.shape[0])
-
-                # Censor the face
-                frame = censor_face(frame, left, top, width, height)
-
-            # Display the resulting frame
-            cv2.imshow('Video', frame)
-
-            # Break the loop on 'q' key press
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-            # Add a short delay to avoid hitting the Rekognition API too frequently
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        print("Video capture interrupted by user.")
-
-    finally:
-        # Release the capture and destroy windows
-        video_capture.release()
-        cv2.destroyAllWindows()
-        print("Video capture released and windows destroyed.")
-
-
-if __name__ == "__main__":
-    main()

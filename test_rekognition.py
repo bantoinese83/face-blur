@@ -44,7 +44,3 @@ class TestCensorFace(unittest.TestCase):
         for left, top, width, height in [(10, 10, 50, 50), (20, 20, 30, 30), (30, 30, 20, 20)]:
             result = censor_face(self.mock_frame, left, top, width, height, pixelation_level)
             self.assertIsNotNone(result)
-
-
-if __name__ == '__main__':
-    unittest.main()
